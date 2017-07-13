@@ -1,36 +1,38 @@
 import React from 'react';
 
-class App extends React.Component{
-  render(){
+class App extends React.Component { 
+  constructor(){
+    super();
+    this.state = {
+      items: []
+    }
+  }
+  componentWillMount(){
+    fetch('http://swapi.co/api/starships/?format=json')
+      .then(response => response.json())
+      .then(({results: items}) => this.setState({items}))
+  }
+  filter(e){
+    this.setState({filter: e.target.value})
+  }
+  render() {
+    let items = this.state.items;
+    if(this.state.filter){
+      items = items.filter( item =>
+        item.name.toLowerCase()
+        .includes(this.state.filter.toLowerCase()))
+    }
     return (
       <div>
-        <Button>button</Button>
-        <hr/>
-        <Label>label</Label>
+        <input type="text" onChange={this.filter.bind(this)}/>
+        {items.map(item=>
+          <Person key={item.name} person={item} />)}
       </div>
     )
   }
+
 }
 
-const Button = (props) => <button>{props.children}</button>
-
-class Label extends React.Component{
-  render(){
-    return (
-      <label>{this.props.children}</label>
-    )
-  }
-}
-
-
-// const Button = (props) => <button>{props.children}</button>
-// *NOTE: Both button and labele do the same thing just differently.
-// class Label extends React.Component{
-//   render(){
-//     return (
-//       <label>{this.props.children}</label>
-//     )
-//   }
-// }
+const Person = (props) => <h4>{props.person.name}</h4>
 
 export default App;
